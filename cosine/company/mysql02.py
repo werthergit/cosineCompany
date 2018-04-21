@@ -9,13 +9,16 @@ import pymysql
 
 #select COMPANY_NAME,LEGAL_PERSON_NAME from company_180415 where id in (330142, 655315, 13595834, 104453189);
 
-def dict2list(k,v,dic:dict):
+def groupBySimilarity(k,v,dic:dict):
     list_group =[]
     for k2, v2 in dic.items():
         #print('k,k2',k,k2)
         if k!=k2 :
             s = Similarity(v.items(), v2.items())
+            # if k == 274667:
+            #     print("score", k, k2)
             if s.similar() > 0:
+                #print("score",k,k2,s.similar())
                 list_group.append(k)
                 list_group.append(k2)
     #print('list_group',list_group)
@@ -73,7 +76,7 @@ if '__main__' == __name__:
         now2 = datetime.datetime.now()
         print(now2 - now1)
 
-        # 定义字典
+        # 相关人员
         dict1 = {}
         for cid in list:
             # 执行SQL语句
@@ -93,6 +96,7 @@ if '__main__' == __name__:
                 dictAllTemp1.setdefault(cid, dict_1)
 
 
+        #企业
         for cid in list:
             # 执行SQL语句
             # print(sql3 % cid)
@@ -113,16 +117,24 @@ if '__main__' == __name__:
         # print('dictAllTemp2 ', dictAllTemp2)
         for (k, v) in dictAll.items():
             dictAll[k] = dictAll[k].copy()
+
         #print('dictAll ', dictAll)
         for (k, v) in dictAllTemp1.items():
             for (k1, v1) in v.items():
-                   # print("k,k1",k,k1,v[k1])
-                   dictAll[k][k1] = 1
+                   #print("k,k1",k,k1,v[k1])
+                   dictAll[k][str(k1)] = 1
         print('dictAll 同公司相关姓名设置为1 ', dictAll)
+        #print('企业：',dictAllTemp2)
+
+        #当前公司的value为1，如果参与比较的话
+        for (k, v) in dictAll.items():
+            if str(k) in dictAll[k]:
+                #print("参与比较的公司：",k)
+                dictAll[k][str(k)] = 1
+
         for (k, v) in dictAllTemp2.items():
             for (k1, v1) in v.items():
-               # print("k,k1",k,k1,v[k1])
-               dictAll[k][k1] = 1
+               dictAll[k][str(k1)] = 1
         print('dictAll 同公司相关企业设置为1 ', dictAll)
 
         #分组
@@ -130,7 +142,7 @@ if '__main__' == __name__:
         dictTemp = dictAll.copy();
         for k, v in dictAll.items():
             list_group = []
-            list_group = dict2list(k, v, dictTemp)
+            list_group = groupBySimilarity(k, v, dictTemp)
             #print('list_group:',list_group)
             if len(list_group) > 0:
                 for listkey in set(list_group) :
@@ -145,7 +157,7 @@ if '__main__' == __name__:
                    listAll.append(set(list_group))
         print('listAll:',listAll)
 
-
+        #print('todo 合并')
     except Exception  as err:
         print("Error: unable to fetch data"+err)
 
