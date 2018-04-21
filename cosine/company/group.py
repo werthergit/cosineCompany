@@ -1,15 +1,20 @@
 from cosine.T3 import Similarity
-from cosine.VectorCompare import VectorCompare
 
-def dict2list(dic:dict):
-    ''' 将字典转化为列表 '''
-    keys = dic.keys()
-    vals = dic.values()
-    lst = [(key, val)
-    for key, val in
-           zip(keys, vals)]
-    print(lst)
-    return lst
+
+
+
+def dict2list(k,v,dic:dict):
+    list_group =[]
+    for k2, v2 in dic.items():
+        #print('k,k2',k,k2)
+        if k!=k2 :
+            s = Similarity(v.items(), v2.items())
+            if s.similar() > 0:
+                list_group.append(k)
+                list_group.append(k2)
+    #print('list_group',list_group)
+    return list_group
+
 
 if '__main__' == __name__:
     print('dddddddd')
@@ -23,26 +28,20 @@ if '__main__' == __name__:
 
 
     listAll=[]
-    for k,v in dict1.items():
-        list_group =[]
-        for k2, v2 in dict1.items():
-            if k != k2:
-                # print(k)
-                s = Similarity(v.items(), v2.items())
-                # print(s.similar())
-                if s.similar() > 0:
-                    if list_group.count(k) <=0 :
-                       list_group.append(k)
-                    if list_group.count(k2)<= 0:
-                       list_group.append(k2)
-        #print('before:',list_group)
-        # 排序
-        list_group.sort()
-        #print('after:', list_group)
+    dictTemp = dict1.copy();
+    for k ,v in dict1.items():
+        #print('k:',k)
+        list_group = []
+        list_group = dict2list(k,v, dictTemp)
         if len(list_group)>0 :
-           if (listAll.count(list_group))<=0:
-               #print('list,list_group:',list,list_group)
-               listAll.append(list_group)
+            for listkey in set(list_group):
+                print('list_key',listkey)
+                print('dictTemp', dictTemp)
+                if len(dictTemp)>0:
+                   dictTemp.pop(listkey)
+            #print('dictTemp:',dictTemp)
+            #list_group = dict2list(k)
+            listAll.append(list_group)
     print(listAll)
     # setAll = set(list)
     # print(setAll)

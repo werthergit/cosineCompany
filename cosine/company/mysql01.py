@@ -117,32 +117,29 @@ try:
            dictAll[k][k1] = 1
     print('dictAll 同公司相关企业设置为1 ', dictAll)
 
-    list_all = []
-    list_abc = []
-    #比较相似度
-    for (k, v) in dictAll.items():
-        t1 = v.items();
-        list_sim = []
-        for (k1, v1) in dictAll.items():
-            if k != k1 :
-                print("k,k1",k,k1)
-                #print("v,v1", v, v1)
-                s = Similarity(v.items(), v1.items())
-                print(s.similar())
+    listAll = []
+    for k, v in dictAll.items():
+        list_group = []
+        for k2, v2 in dictAll.items():
+            if k != k2:
+                # print(k)
+                s = Similarity(v.items(), v2.items())
+                # print(s.similar())
                 if s.similar() > 0:
-                    if list_abc.count(k)<=0 :
-                       list_sim.append(k)
-                       list_abc.append(k)
-                    if list_abc.count(k1)<=0 :
-                       list_sim.append(k1)
-                       list_abc.append(k1)
-                    #print("k,k1", k, k1,s.similar())
-                    #todo 分组
-                    if len(list_sim)>0:
-                       list_all.append(list_sim)
-    print(list_all)
-    for listTemp in list_all:
-        print(listTemp, len(listTemp))
+                    if list_group.count(k) <= 0:
+                        list_group.append(k)
+                    if list_group.count(k2) <= 0:
+                        list_group.append(k2)
+        # print('before:',list_group)
+        # 排序
+        list_group.sort()
+        # print('after:', list_group)
+        if len(list_group) > 0:
+            if (listAll.count(list_group)) <= 0:
+                # print('list,list_group:',list,list_group)
+                listAll.append(list_group)
+    print(listAll)
+
 except Exception  as err:
     print("Error: unable to fetch data"+err)
 
